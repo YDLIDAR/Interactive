@@ -1,11 +1,11 @@
-#ifndef YDLIDAR_DRIVER_H
+﻿#ifndef YDLIDAR_DRIVER_H
 #define YDLIDAR_DRIVER_H
 #include <stdlib.h>
 #include <atomic>
-#include "serial.h"
-#include "ActiveSocket.h"
 #include "locker.h"
+#include "serial/serial.h"
 #include "thread.h"
+#include "sockets/ActiveSocket.h"
 
 #if !defined(__cplusplus)
 #ifndef __cplusplus
@@ -37,9 +37,11 @@
 #define LIDAR_ANS_TYPE_MEASUREMENT          0x81
 #define LIDAR_RESP_MEASUREMENT_SYNCBIT        (0x1<<0)
 #define LIDAR_RESP_MEASUREMENT_QUALITY_SHIFT  2
+#define LIDAR_RESP_MEASUREMENT_SYNC_QUALITY_SHIFT  8
 #define LIDAR_RESP_MEASUREMENT_CHECKBIT       (0x1<<0)
 #define LIDAR_RESP_MEASUREMENT_ANGLE_SHIFT    1
-#define LIDAR_RESP_MEASUREMENT_DISTANCE_SHIFT  2
+#define LIDAR_RESP_MEASUREMENT_DISTANCE_SHIFT    2
+
 
 #define LIDAR_CMD_RUN_POSITIVE             0x06
 #define LIDAR_CMD_RUN_INVERSION            0x07
@@ -85,13 +87,27 @@ typedef enum {
 #pragma pack(1)
 #endif
 
+
+struct touch_info {
+  uint64_t    stamp;      /**< 当前触点时间戳. */
+  uint16_t    touchid;    /**< 屏幕box中当前触点ID. */
+  bool        isvalid;     /**< 当前点是否在设定的屏幕范围内. */
+  bool        new_frame;  /**<是否是新的一帧激光. */
+  float       screen_x;   /**<屏幕坐标系X(mm). */
+  float       screen_y;   /**<屏幕坐标系Y(mm). */
+  float       laser_x;    /**<雷达坐标系X(mm). */
+  float       laser_y;   /**<雷达坐标系Y(mm). */
+} __attribute__((packed)) ;
+
+
+
+
 struct node_info {
-  uint8_t    sync_flag;  //sync flag
-  uint8_t    sync_quality;//!信号质量
-  uint16_t   angle_q6_checkbit; //!测距点角度
-  uint16_t   distance_q2; //! 当前测距点距离
-  uint64_t   stamp; //! 时间戳
-  uint8_t    scan_frequence;//! 特定版本此值才有效,无效值是0
+  uint8_t    sync_flag;
+  uint16_t    sync_quality;
+  uint16_t   angle_q6_checkbit;
+  uint16_t   distance_q;
+  uint64_t   stamp;
 } __attribute__((packed)) ;
 
 struct PackageNode {
@@ -121,23 +137,23 @@ struct node_packages {
 
 
 struct device_info {
-  uint8_t   model; ///< 雷达型号
-  uint16_t  firmware_version; ///< 固件版本号
-  uint8_t   hardware_version; ///< 硬件版本号
-  uint8_t   serialnum[16];    ///< 系列号
+  uint8_t   model; /**< 雷达型号. */
+  uint16_t  firmware_version; /**< 固件版本号. */
+  uint8_t   hardware_version; /**< 硬件版本号. */
+  uint8_t   serialnum[16];    /**< 系列号. */
 } __attribute__((packed)) ;
 
 struct device_health {
-  uint8_t   status; ///< 健康状体
-  uint16_t  error_code; ///< 错误代码
+  uint8_t   status; /**< 健康状体. */
+  uint16_t  error_code; /**< 错误代码. */
 } __attribute__((packed))  ;
 
 struct sampling_rate {
-  uint8_t rate;	///< 采样频率
+  uint8_t rate;	/**< 采样频率. */
 } __attribute__((packed))  ;
 
 struct scan_frequency {
-  uint32_t frequency;	///< 扫描频率
+  uint32_t frequency;	/**< 扫描频率. */
 } __attribute__((packed))  ;
 
 struct scan_rotation {
@@ -145,11 +161,11 @@ struct scan_rotation {
 } __attribute__((packed))  ;
 
 struct scan_exposure {
-  uint8_t exposure;	///< 低光功率模式
+  uint8_t exposure;	/**< 低光功率模式. */
 } __attribute__((packed))  ;
 
 struct scan_heart_beat {
-  uint8_t enable;	///< 掉电保护状态
+  uint8_t enable;	/**< 掉电保护状态. */
 } __attribute__((packed));
 
 struct scan_points {
@@ -176,47 +192,11 @@ struct lidar_ans_header {
 } __attribute__((packed));
 
 
-//! A struct for returning configuration from the YDLIDAR
-struct LaserConfig {
-  //! Start angle for the laser scan [rad].  0 is forward and angles are measured clockwise when viewing YDLIDAR from the top.
-  float min_angle;
-  //! Stop angle for the laser scan [rad].   0 is forward and angles are measured clockwise when viewing YDLIDAR from the top.
-  float max_angle;
-  //! Scan resolution [rad].
-  float ang_increment;
-  //! Scan resoltuion [s]
-  float time_increment;
-  //! Time between scans
-  float scan_time;
-  //! Minimum range [m]
-  float min_range;
-  //! Maximum range [m]
-  float max_range;
-  //! Range Resolution [m]
-  float range_res;
-};
-
-
-//! A struct for returning laser readings from the YDLIDAR
-//! currentAngle = min_angle + ang_increment*index
-//! for( int i =0; i < ranges.size(); i++) {
-//!     double currentAngle = config.min_angle + i*config.ang_increment;
-//!     double currentDistance = ranges[i];
-//! }
-//!
-//!
-//!
-struct LaserScan {
-  //! Array of ranges
-  std::vector<float> ranges;
-  //! Array of intensities
-  std::vector<float> intensities;
-  //! Self reported time stamp in nanoseconds
-  uint64_t self_time_stamp;
-  //! System time when first range was measured in nanoseconds
-  uint64_t system_time_stamp;
-  //! Configuration of scan
-  LaserConfig config;
+struct LaserPose {
+  float   x;      /**< 雷达在屏幕坐标系中的X位置(mm). */
+  float   y;      /**< 雷达在屏幕坐标系中的Y位置(mm). */
+  float   theta;  /**< 雷达在屏幕坐标系中的朝向(度). */
+  bool    reversion; /**< 雷达表面朝向(false: 朝外, true:朝里). */
 };
 
 using namespace std;
@@ -273,7 +253,7 @@ class YDlidarDriver {
   * @retval true     正在扫图
   * @retval false    扫图关闭
   */
-  bool isscanning() const;
+  const bool isscanning() const;
 
   /**
   * @brief 连接雷达状态 \n
@@ -281,9 +261,7 @@ class YDlidarDriver {
   * @retval true     成功
   * @retval false    失败
   */
-  bool isconnected() const;
-
-  bool checkHeartBeat();
+  const bool isconnected() const;
 
   /**
   * @brief 设置雷达是否带信号质量 \n
@@ -291,9 +269,9 @@ class YDlidarDriver {
   * @param[in] isintensities    是否带信号质量:
   *     true	带信号质量
   *	  false 无信号质量
-  * @note只有S4B(波特率是153600)雷达支持带信号质量, 别的型号雷达暂不支持
+  * @note只有S4B雷达支持带信号质量, 别的型号雷达暂不支持
   */
-  void setIntensities(const bool &isintensities);
+  void setIntensities(const bool isintensities);
 
   /**
   * @brief 获取当前雷达掉电保护功能 \n
@@ -309,10 +287,8 @@ class YDlidarDriver {
   *     true	开启
   *	  false 关闭
   * @note只有(G4, G4C, F4PRO)雷达支持掉电保护功能, 别的型号雷达暂不支持
-  * 并且版本号大于等于2.0.9 才支持此功能, 小于2.0.9版本禁止开启掉电保护
   */
-  void setHeartBeat(const bool &enable);
-
+  void setHeartBeat(const bool enable);
 
   /**
   * @brief 设置雷达异常自动重新连接 \n
@@ -321,6 +297,43 @@ class YDlidarDriver {
   *	  false 关闭
   */
   void setAutoReconnect(const bool &enable);
+
+
+  /**
+  * @brief 发送掉电保护命令 \n
+  * @return 返回执行结果
+  * @retval RESULT_OK       发送成功
+  * @retval RESULT_FAILE    发送失败
+  * @note只有(G4, G4C, F4PRO)雷达支持掉电保护功能, 别的型号雷达暂不支持
+  */
+  result_t sendHeartBeat();
+
+  /**
+  * @brief 设置屏幕所在区域大小 \n
+  * @return 无
+  * @param[in] max_x    屏幕最大X轴值
+  * @param[in] max_y    屏幕最大Y轴值
+  * @param[in] min_x    屏幕最小X轴值
+  * @param[in] min_y    屏幕最小Y轴值
+  * @note左上角是屏幕坐标原点, X轴右, Y轴朝下
+  *
+  *   ||----------------\ X
+  *   ||----------------/
+  *   ||
+  *   ||
+  *   ||
+  *   ||
+  *   \/
+  *    Y
+  */
+  void setScreenBox(const float &max_x, const float &max_y, const float &min_x, const float &min_y);
+
+  /**
+  * @brief 设置雷达在屏幕坐标系中的位置 \n
+  * @return 无
+  * @param[in] LaserPose   雷达位置
+  */
+  void setLaserPose(const LaserPose &pose);
 
   /**
   * @brief 获取雷达设备健康状态 \n
@@ -361,29 +374,18 @@ class YDlidarDriver {
 
 
   /**
-  * @brief 获取激光数据 \n
-  * @param[in] nodebuffer 激光点信息
-  * @param[in] count      一圈激光点数
+  * @brief 获取激光在屏幕box中的数据 \n
+  * @param[in] pointbuffer 激光点在屏幕上的坐标信息
+  * @param[in] count      box中有效激光点数
   * @param[in] timeout    超时时间
   * @return 返回执行结果
   * @retval RESULT_OK       获取成功
   * @retval RESULT_FAILE    获取失败
   * @note 获取之前，必须使用::startScan函数开启扫描
   */
-  result_t grabScanData(node_info *nodebuffer, size_t &count, uint32_t timeout = DEFAULT_TIMEOUT) ;
+  result_t grabScanData(touch_info *pointbuffer, size_t &count, uint32_t timeout = DEFAULT_TIMEOUT) ;
 
 
-  /**
-  * @brief 补偿激光角度 \n
-  * 把角度限制在0到360度之间
-  * @param[in] nodebuffer 激光点信息
-  * @param[in] count      一圈激光点数
-  * @return 返回执行结果
-  * @retval RESULT_OK       成功
-  * @retval RESULT_FAILE    失败
-  * @note 补偿之前，必须使用::grabScanData函数获取激光数据成功
-  */
-  result_t ascendScanData(node_info *nodebuffer, size_t count);
 
   /**
   * @brief 重置激光雷达 \n
@@ -471,7 +473,7 @@ class YDlidarDriver {
   * @brief 获取激光雷达当前采样频率 \n
   * @param[in] frequency    采样频率
   * @param[in] timeout      超时时间
-	* @return 返回执行结果
+  * @return 返回执行结果
   * @retval RESULT_OK       成功
   * @retval RESULT_FAILE    失败
   * @note 停止扫描后再执行当前操作
@@ -620,7 +622,7 @@ class YDlidarDriver {
   * @return 返回执行结果
   * @retval RESULT_OK       成功
   * @retval RESULT_FAILE    失败
-  * @note 停止扫描后再执行当前操作, 当前操作是开关量, (G4, G4C, F4PRO)版本号大于等于2.0.9才支持
+  * @note 停止扫描后再执行当前操作, 当前操作是开关量, (G4, G4C, F4PRO)支持
   */
   result_t setScanHeartbeat(scan_heart_beat &beat, uint32_t timeout = DEFAULT_TIMEOUT);
 
@@ -630,7 +632,7 @@ class YDlidarDriver {
   * @param[in] timeout      超时时间
   * @return 返回执行结果
   * @retval RESULT_OK       成功
-	* @retval RESULT_FAILE    失败
+  * @retval RESULT_FAILE    失败
   * @note 停止扫描后再执行当前操作, 当前操作是开关量,只有S4雷达支持此功能
   */
   result_t setPointsForOneRingFlag(scan_points &points, uint32_t timeout = DEFAULT_TIMEOUT);
@@ -643,7 +645,6 @@ class YDlidarDriver {
   * @note 创建解析雷达数据线程之前，必须使用::startScan函数开启扫图成功
   */
   result_t createThread();
-
 
   /**
   * @brief 重新连接开启扫描 \n
@@ -659,22 +660,22 @@ class YDlidarDriver {
 
   /**
   * @brief 解包激光数据 \n
-  * @param[in] node 解包后激光点信息
+  * @param[in] point 解包后激光点在屏幕坐标系中的信息
   * @param[in] timeout     超时时间
   */
-  result_t waitPackage(node_info *node, uint32_t timeout = DEFAULT_TIMEOUT);
+  result_t waitPackage(touch_info *point, uint32_t timeout = DEFAULT_TIMEOUT);
 
   /**
-  * @brief 发送数据到雷达 \n
-  * @param[in] nodebuffer 激光信息指针
-  * @param[in] count      激光点数大小
+  * @brief 等待激光数据 \n
+  * @param[in] pointbuffer 激光点在屏幕上的坐标信息
+  * @param[in] count        激光在屏幕坐标系中的大小
   * @param[in] timeout      超时时间
   * @return 返回执行结果
   * @retval RESULT_OK       成功
   * @retval RESULT_TIMEOUT  等待超时
   * @retval RESULT_FAILE    失败
   */
-  result_t waitScanData(node_info *nodebuffer, size_t &count, uint32_t timeout = DEFAULT_TIMEOUT);
+  result_t waitScanData(touch_info *pointbuffer, size_t &count, uint32_t timeout = DEFAULT_TIMEOUT);
 
   /**
   * @brief 激光数据解析线程 \n
@@ -738,20 +739,6 @@ class YDlidarDriver {
   */
   result_t sendData(const uint8_t *data, size_t size);
 
-  /**
-  * @brief 发送掉电保护命令 \n
-  * @return 返回执行结果
-  * @retval RESULT_OK       发送成功
-  * @retval RESULT_FAILE    发送失败
-  * @note只有(G4, G4C, F4PRO)雷达支持掉电保护功能, 别的型号雷达暂不支持
-  */
-  result_t sendHeartBeat();
-
-  /**
-  * @brief checkTransTime
-  */
-  void checkTransTime();
-
 
   /**
   * @brief 关闭数据获取通道 \n
@@ -768,14 +755,21 @@ class YDlidarDriver {
   */
   void clearDTR();
 
+  /**
+  *@brief 判断点是否在屏幕中 \n
+  * @param[in] x 	激光屏幕坐标x值
+  * @param[in] y    激光屏幕坐标y值
+  *
+  */
+  bool inBox(const float &x, const float &y);
+
 
  public:
   std::atomic<bool>     isConnected;  ///< 串口连接状体
   std::atomic<bool>     isScanning;   ///< 扫图状态
   std::atomic<bool>     isHeartbeat;  ///< 掉电保护状态
   std::atomic<bool>     isAutoReconnect;  ///< 异常自动从新连接
-  std::atomic<bool>     isAutoconnting;  ///< 是否正在自动连接中
-
+  std::atomic<bool>     isAutoconnting; ///< 是否正在自动连接中
 
   enum {
     DEFAULT_TIMEOUT = 2000,    /**< 默认超时时间. */
@@ -794,26 +788,25 @@ class YDlidarDriver {
     YDLIDAR_G4C = 9, /**< G4C雷达型号代号. */
 
   };
-  node_info      scan_node_buf[2048];  ///< 激光点信息
-  size_t         scan_node_count;      ///< 激光点数
+  touch_info     touch_point_buf[2048];  ///< 触摸点信息
+  size_t         touch_point_count;      ///< 触摸点数
   Event          _dataEvent;			 ///< 数据同步事件
   Locker         _lock;				///< 线程锁
-  Locker         _serial_lock;		///< 串口锁
+  Locker         _serial_lock;       ///< 串口锁
+  Locker         _plock;				///< 参数线程锁
   Thread 	       _thread;				///< 线程id
 
  private:
   int PackageSampleBytes;             ///< 一个包包含的激光点数
-  ChannelDevice *_serial;			///< 串口
+  ChannelDevice *_serial;			    ///< 串口
   bool m_intensities;					///< 信号质量状体
   int _sampling_rate;					///< 采样频率
   int model;							///< 雷达型号
   uint32_t _baudrate;					///< 波特率
   bool isSupportMotorCtrl;			///< 是否支持电机控制
   uint64_t m_ns;						///< 时间戳
-  uint64_t m_last_ns;
   uint32_t m_pointTime;				///< 激光点直接时间间隔
   uint32_t trans_delay;				///< 串口传输一个byte时间
-  uint16_t firmware_version;          ///< 雷达固件版本号
 
   node_package package;
   node_packages packages;
@@ -830,10 +823,18 @@ class YDlidarDriver {
   uint16_t LastSampleAngleCal;
   bool CheckSunResult;
   uint16_t Valu8Tou16;
+  uint16_t touchid;///< 触点ID
 
+  float screen_max_x;///< 屏幕X轴最大值
+  float screen_max_y;///< 屏幕Y轴最大值
+  float screen_min_x;///< 屏幕X轴最小值
+  float screen_min_y;///< 屏幕Y轴最小值
+
+  LaserPose laser_pose; ///< 雷达在屏幕坐标系的位置
+
+  bool  reversion;///< 雷达反转安装
   std::string serial_port;///< 雷达端口
   uint8_t     m_driver_type;
-
 };
 }
 

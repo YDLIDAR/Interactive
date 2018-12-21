@@ -1,14 +1,8 @@
 var searchData=
 [
-  ['sampling_5frate',['sampling_rate',['../structsampling__rate.html',1,'']]],
-  ['scan_5fexposure',['scan_exposure',['../structscan__exposure.html',1,'']]],
-  ['scan_5ffrequency',['scan_frequency',['../structscan__frequency.html',1,'']]],
-  ['scan_5fheart_5fbeat',['scan_heart_beat',['../structscan__heart__beat.html',1,'']]],
-  ['scan_5fpoints',['scan_points',['../structscan__points.html',1,'']]],
-  ['scan_5frotation',['scan_rotation',['../structscan__rotation.html',1,'']]],
-  ['scopedlocker',['ScopedLocker',['../class_scoped_locker.html',1,'']]],
-  ['scopedreadlock',['ScopedReadLock',['../classserial_1_1_serial_1_1_scoped_read_lock.html',1,'serial::Serial']]],
-  ['scopedwritelock',['ScopedWriteLock',['../classserial_1_1_serial_1_1_scoped_write_lock.html',1,'serial::Serial']]],
-  ['serial',['Serial',['../classserial_1_1_serial.html',1,'serial']]],
-  ['serialimpl',['SerialImpl',['../classserial_1_1serial_1_1_serial_1_1_serial_impl.html',1,'serial::Serial']]]
+  ['millisecondtimer',['MillisecondTimer',['../classserial_1_1_millisecond_timer.html',1,'serial']]],
+  ['mousebuttonevent',['MouseButtonEvent',['../struct_s_l_1_1_input___lite_1_1_mouse_button_event.html',1,'SL::Input_Lite']]],
+  ['mousepositionabsoluteevent',['MousePositionAbsoluteEvent',['../struct_s_l_1_1_input___lite_1_1_mouse_position_absolute_event.html',1,'SL::Input_Lite']]],
+  ['mousepositionoffsetevent',['MousePositionOffsetEvent',['../struct_s_l_1_1_input___lite_1_1_mouse_position_offset_event.html',1,'SL::Input_Lite']]],
+  ['mousescrollevent',['MouseScrollEvent',['../struct_s_l_1_1_input___lite_1_1_mouse_scroll_event.html',1,'SL::Input_Lite']]]
 ];

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['ang_5fincrement',['ang_increment',['../struct_laser_config.html#a67279ae0f648a129521576f52c321932',1,'LaserConfig']]],
-  ['angle_5fq6_5fcheckbit',['angle_q6_checkbit',['../structnode__info.html#a73e1d282a573f3daa74332fe29b90a26',1,'node_info']]]
+  ['description',['description',['../structserial_1_1_port_info.html#a2ba37dd33d47b554aef5c15c1fe8b872',1,'serial::PortInfo']]],
+  ['device_5fid',['device_id',['../structserial_1_1_port_info.html#af6a8211d14bccb07b538ac584d195466',1,'serial::PortInfo']]]
 ];

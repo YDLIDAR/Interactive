@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['laserconfig',['LaserConfig',['../struct_laser_config.html',1,'']]],
-  ['laserscan',['LaserScan',['../struct_laser_scan.html',1,'']]],
-  ['lidar_5fans_5fheader',['lidar_ans_header',['../structlidar__ans__header.html',1,'']]],
-  ['listen',['Listen',['../classydlidar_1_1_c_passive_socket.html#acb2cd2c41a1958fa6cbd14f47b4236fe',1,'ydlidar::CPassiveSocket']]],
-  ['locker',['Locker',['../class_locker.html',1,'']]]
+  ['keyevent',['KeyEvent',['../struct_s_l_1_1_input___lite_1_1_key_event.html',1,'SL::Input_Lite']]],
+  ['kmtree',['KmTree',['../classydlidar_1_1math_1_1_km_tree.html',1,'ydlidar::math']]]
 ];

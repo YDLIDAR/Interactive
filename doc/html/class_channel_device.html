@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>YDLIDAR SDK: ChannelDevice Class Reference</title>
+<title>YDLIDAR SDK SCREEN INTERACTION: ChannelDevice Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,8 +24,8 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="ydliar.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">YDLIDAR SDK
-   &#160;<span id="projectnumber">V1.3.6</span>
+   <div id="projectname">YDLIDAR SDK SCREEN INTERACTION
+   &#160;<span id="projectnumber">V1.1.2</span>
    </div>
   </td>
  </tr>
@@ -116,21 +116,21 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>open</b> ()=0
 <tr class="memitem:ad78cd2bf8cdffc0370b577c0a2351d86"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad78cd2bf8cdffc0370b577c0a2351d86"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>isOpen</b> ()=0</td></tr>
 <tr class="separator:ad78cd2bf8cdffc0370b577c0a2351d86"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9ff416c732e31a06981991d6147d0ca0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9ff416c732e31a06981991d6147d0ca0"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>closePort</b> ()=0</td></tr>
-<tr class="separator:a9ff416c732e31a06981991d6147d0ca0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf7ee01209c36d1e32bcaf775eeac530"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abf7ee01209c36d1e32bcaf775eeac530"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>closefd</b> ()=0</td></tr>
+<tr class="separator:abf7ee01209c36d1e32bcaf775eeac530"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae75681df746d9fc2b3f02bd1646c799c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae75681df746d9fc2b3f02bd1646c799c"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>flush</b> ()=0</td></tr>
 <tr class="separator:ae75681df746d9fc2b3f02bd1646c799c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a68028c8c0ca964a6655f13b1136cb32d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a68028c8c0ca964a6655f13b1136cb32d"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>waitfordata</b> (size_t data_count, uint32_t timeout=-1, size_t *returned_size=NULL)=0</td></tr>
 <tr class="separator:a68028c8c0ca964a6655f13b1136cb32d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c0389fc99e920cdf317fc7a315b3701"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c0389fc99e920cdf317fc7a315b3701"></a>
-virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><b>writeData</b> (const uint8_t *data, size_t size)=0</td></tr>
-<tr class="separator:a0c0389fc99e920cdf317fc7a315b3701"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a074377369f437da82f4172677608f992"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a074377369f437da82f4172677608f992"></a>
-virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><b>readData</b> (uint8_t *data, size_t size)=0</td></tr>
-<tr class="separator:a074377369f437da82f4172677608f992"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53dc9f14349fe622d76ad50d906e9742"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a53dc9f14349fe622d76ad50d906e9742"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>writedata</b> (const uint8_t *data, size_t size)=0</td></tr>
+<tr class="separator:a53dc9f14349fe622d76ad50d906e9742"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5971c2ef39dd380a01156669661e282d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5971c2ef39dd380a01156669661e282d"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>readdata</b> (unsigned char *data, size_t size)=0</td></tr>
+<tr class="separator:a5971c2ef39dd380a01156669661e282d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af671fd9beeee84ef3be63e617ff46ce4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af671fd9beeee84ef3be63e617ff46ce4"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>setDTR</b> (bool level=true)</td></tr>
 <tr class="separator:af671fd9beeee84ef3be63e617ff46ce4"><td class="memSeparator" colspan="2">&#160;</td></tr>

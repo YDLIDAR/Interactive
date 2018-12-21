@@ -11,7 +11,7 @@ var searchData=
   ['getconnecttimeoutsec',['GetConnectTimeoutSec',['../classydlidar_1_1_c_simple_socket.html#a6f181044a6690b5c90c1a1223d77e013',1,'ydlidar::CSimpleSocket']]],
   ['getconnecttimeoutusec',['GetConnectTimeoutUSec',['../classydlidar_1_1_c_simple_socket.html#a78257e60b158e889953b3002842b2225',1,'ydlidar::CSimpleSocket']]],
   ['getcts',['getCTS',['../classserial_1_1_serial.html#a97603438c9ded81a886f914b7a335d7f',1,'serial::Serial']]],
-  ['getdata',['GetData',['../classydlidar_1_1_c_simple_socket.html#ae3011ed1a5f60ecadd3fe3bbcd80bb9c',1,'ydlidar::CSimpleSocket::GetData()'],['../classydlidar_1_1_y_dlidar_driver.html#ad787e714bc05e5a70a42b096e632c60f',1,'ydlidar::YDlidarDriver::getData()']]],
+  ['getdata',['getData',['../classydlidar_1_1_y_dlidar_driver.html#ad787e714bc05e5a70a42b096e632c60f',1,'ydlidar::YDlidarDriver::getData()'],['../classydlidar_1_1_c_simple_socket.html#ae3011ed1a5f60ecadd3fe3bbcd80bb9c',1,'ydlidar::CSimpleSocket::GetData()']]],
   ['getdeviceinfo',['getDeviceInfo',['../classydlidar_1_1_y_dlidar_driver.html#ab75303116c4ccb144ecc215e94114e1a',1,'ydlidar::YDlidarDriver']]],
   ['getdsr',['getDSR',['../classserial_1_1_serial.html#a91a00816bce6a163ea022b4cf8d4ce0e',1,'serial::Serial']]],
   ['getflowcontrol',['getFlowcontrol',['../classserial_1_1_serial.html#ad793526755625a59a0bf9d4cc0ea1755',1,'serial::Serial']]],
@@ -41,5 +41,5 @@ var searchData=
   ['gettimeout',['getTimeout',['../classserial_1_1_serial.html#a13023f118c75b27fa2f0280d2d1c2a20',1,'serial::Serial']]],
   ['gettotaltimems',['GetTotalTimeMs',['../classydlidar_1_1_c_simple_socket.html#a10ec98a6f67603f972084b5a6ba02b16',1,'ydlidar::CSimpleSocket']]],
   ['gettotaltimeusec',['GetTotalTimeUsec',['../classydlidar_1_1_c_simple_socket.html#aba125f0248c625f1eb339dab9053b7dc',1,'ydlidar::CSimpleSocket']]],
-  ['grabscandata',['grabScanData',['../classydlidar_1_1_y_dlidar_driver.html#a6d6e04efa9d7e5d4aea41ee53d4ea8af',1,'ydlidar::YDlidarDriver']]]
+  ['grabscandata',['grabScanData',['../classydlidar_1_1_y_dlidar_driver.html#a0ea6373032e62fc4b54ad5a882d1e435',1,'ydlidar::YDlidarDriver']]]
 ];
