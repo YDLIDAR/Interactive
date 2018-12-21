@@ -44,6 +44,7 @@ include_directories(
 	include  
 	${INPUT_LITE_PLATFORM_INC}
 )
+SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 add_library(${PROJECT_NAME} 
 	include/Input_Lite.h 
 	src/InputManager.cpp 
