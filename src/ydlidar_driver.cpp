@@ -110,6 +110,7 @@ namespace ydlidar{
             sendCommand(LIDAR_CMD_STOP);
 
         }
+        delay(40);
 		clearDTR();
 		return RESULT_OK;
 	}
@@ -1192,6 +1193,7 @@ namespace ydlidar{
             sendCommand(LIDAR_CMD_FORCE_STOP);
 			sendCommand(LIDAR_CMD_STOP);
 		}
+		delay(20);
 
 		stopMotor();
 
