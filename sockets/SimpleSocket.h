@@ -155,7 +155,7 @@ class CSimpleSocket : public ChannelDevice {
 
  public:
   explicit CSimpleSocket(CSocketType type = SocketTypeTcp);
-  explicit CSimpleSocket(CSimpleSocket &socket);
+  explicit CSimpleSocket(CSimpleSocket& socket);
 
   virtual ~CSimpleSocket() {
     if (m_pBuffer != NULL) {
@@ -163,6 +163,9 @@ class CSimpleSocket : public ChannelDevice {
       m_pBuffer = NULL;
     }
   };
+
+  static void WSACleanUp();
+
 
   /// Initialize instance of CSocket.  This method MUST be called before an
   /// object can be used. Errors : CSocket::SocketProtocolError,
@@ -202,7 +205,7 @@ class CSimpleSocket : public ChannelDevice {
   virtual bool Select(int32_t nTimeoutSec, int32_t nTimeoutUSec);
 
 
-  virtual int WaitForData(size_t data_count, uint32_t timeout, size_t *returned_size);
+  virtual int WaitForData(size_t data_count, uint32_t timeout, size_t* returned_size);
 
   /// Does the current instance of the socket object contain a valid socket
   /// descriptor.
@@ -218,8 +221,8 @@ class CSimpleSocket : public ChannelDevice {
 
   /// Returns a human-readable description of the given error code
   /// or the last error code of a socket
-  static const char *DescribeError(CSocketError err);
-  inline const char *DescribeError() {
+  static const char* DescribeError(CSocketError err);
+  inline const char* DescribeError() {
     return DescribeError(m_socketErrno);
   };
 
@@ -231,7 +234,7 @@ class CSimpleSocket : public ChannelDevice {
   /// @return number of bytes actually received.
   /// @return of zero means the connection has been shutdown on the other side.
   /// @return of -1 means that an error has occurred.
-  virtual int32_t Receive(int32_t nMaxBytes = 1, uint8_t *pBuffer = 0);
+  virtual int32_t Receive(int32_t nMaxBytes = 1, uint8_t* pBuffer = 0);
 
   /// Attempts to send a block of data on an established connection.
   /// @param pBuf block of data to be sent.
@@ -239,7 +242,7 @@ class CSimpleSocket : public ChannelDevice {
   /// @return number of bytes actually sent.
   /// @return of zero means the connection has been shutdown on the other side.
   /// @return of -1 means that an error has occurred.
-  virtual int32_t Send(const uint8_t *pBuf, size_t bytesToSend);
+  virtual int32_t Send(const uint8_t* pBuf, size_t bytesToSend);
 
   /// Attempts to send at most nNumItem blocks described by sendVector
   /// to the socket descriptor associated with the socket object.
@@ -249,7 +252,7 @@ class CSimpleSocket : public ChannelDevice {
   /// @return number of bytes actually sent, return of zero means the
   /// connection has been shutdown on the other side, and a return of -1
   /// means that an error has occurred.
-  virtual int32_t Send(const struct iovec *sendVector, int32_t nNumItems);
+  virtual int32_t Send(const struct iovec* sendVector, int32_t nNumItems);
 
   /// Copies data between one file descriptor and another.
   /// On some systems this copying is done within the kernel, and thus is
@@ -263,7 +266,7 @@ class CSimpleSocket : public ChannelDevice {
   /// @param pOffset from which to start reading data from input file.
   /// @param nCount number of bytes to copy between file descriptors.
   /// @return number of bytes written to the out socket descriptor.
-  virtual int32_t SendFile(int32_t nOutFd, int32_t nInFd, off_t *pOffset, int32_t nCount);
+  virtual int32_t SendFile(int32_t nOutFd, int32_t nInFd, off_t* pOffset, int32_t nCount);
 
   /// Returns blocking/non-blocking state of socket.
   /// @return true if the socket is non-blocking, else return false.
@@ -283,7 +286,7 @@ class CSimpleSocket : public ChannelDevice {
   /// pointer when finished.  This memory is managed internally by the CSocket
   /// class.
   /// @return pointer to data if valid, else returns NULL.
-  uint8_t *GetData(void)  {
+  uint8_t* GetData(void)  {
     return m_pBuffer;
   };
 
@@ -394,7 +397,7 @@ class CSimpleSocket : public ChannelDevice {
 
   /// Bind socket to a specific interface when using multicast.
   /// @return true if successfully bound to interface
-  bool BindInterface(const char *pInterface);
+  bool BindInterface(const char* pInterface);
 
   /// Gets the timeout value that specifies the maximum number of seconds a
   /// a call to CSimpleSocket::Send waits until it completes.
@@ -459,13 +462,13 @@ class CSimpleSocket : public ChannelDevice {
   };
 
   /// set socket descriptor
-  void SetSocketType(const CSocketType &type) {
+  void SetSocketType(const CSocketType& type) {
     m_nSocketType = type;
   }
 
   /// Returns clients Internet host address as a string in standard numbers-and-dots notation.
   ///  @return NULL if invalid
-  const char *GetClientAddr() {
+  const char* GetClientAddr() {
     return inet_ntoa(m_stClientSockaddr.sin_addr);
   };
 
@@ -477,7 +480,7 @@ class CSimpleSocket : public ChannelDevice {
 
   /// Returns server Internet host address as a string in standard numbers-and-dots notation.
   ///  @return NULL if invalid
-  const char *GetServerAddr() {
+  const char* GetServerAddr() {
     return inet_ntoa(m_stServerSockaddr.sin_addr);
   };
 
@@ -523,11 +526,9 @@ class CSimpleSocket : public ChannelDevice {
   /// @return false if failed to set socket option otherwise return true;
   bool EnableNagleAlgoritm();
 
-  virtual bool Open(const char *pAddr, uint16_t nPort) {
-    return true;
-  }
+  virtual bool Open(const char* pAddr, uint16_t nPort) {return true;}
 
-  virtual bool bindport(const char *, uint32_t);
+  virtual bool bindport(const char*, uint32_t);
 
   virtual bool open();
 
@@ -537,11 +538,11 @@ class CSimpleSocket : public ChannelDevice {
 
   virtual void flush();
 
-  virtual int waitfordata(size_t data_count, uint32_t timeout = -1, size_t *returned_size = NULL);
+  virtual int waitfordata(size_t data_count, uint32_t timeout = -1, size_t* returned_size = NULL);
 
-  virtual size_t writeData(const uint8_t *data, size_t size);
+  virtual size_t writeData(const uint8_t* data, size_t size);
 
-  virtual size_t readData(uint8_t *data, size_t size);
+  virtual size_t readData(uint8_t* data, size_t size);
 
 
  protected:
@@ -580,16 +581,16 @@ class CSimpleSocket : public ChannelDevice {
   /// @return number of bytes actually sent, return of zero means the
   /// connection has been shutdown on the other side, and a return of -1
   /// means that an error has occurred.
-  int32_t Writev(const struct iovec *pVector, size_t nCount);
+  int32_t Writev(const struct iovec* pVector, size_t nCount);
 
 
 
-  CSimpleSocket *operator=(CSimpleSocket &socket);
+  CSimpleSocket* operator=(CSimpleSocket& socket);
 
  protected:
   SOCKET               m_socket;            /// socket handle
   CSocketError         m_socketErrno;       /// number of last error
-  uint8_t              *m_pBuffer;           /// internal send/receive buffer
+  uint8_t*              m_pBuffer;           /// internal send/receive buffer
   int32_t              m_nBufferSize;       /// size of internal send/receive buffer
   int32_t              m_nSocketDomain;     /// socket type PF_INET, PF_INET6
   CSocketType          m_nSocketType;       /// socket type - UDP, TCP or RAW

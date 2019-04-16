@@ -53,17 +53,38 @@
 #include <sys/time.h>
 #endif
 
-
 #include "Host.h"
 
 #if defined(_WIN32)
-#define GET_CLOCK_COUNT(x) QueryPerformanceCounter((LARGE_INTEGER *)x)
-#else
-#define GET_CLOCK_COUNT(x) gettimeofday(x, NULL)
+#if !defined (_WINSOCK2API_)&& !defined(_WINSOCKAPI_)
+struct timeval {
+  long tv_sec;
+  long tv_usec;
+}
 #endif
+
+inline static int gettimeofday(struct timeval* tv, void* tz) {
+  union {
+    long long ns100;
+    FILETIME    t;
+  } now;
+  GetSystemTimeAsFileTime(&now.t);
+  tv->tv_usec = long((now.ns100 / 10LL) % 1000000LL);
+  tv->tv_sec = long((now.ns100 - 116444736000000000LL) / 10000000LL);
+  return 0;
+}
+#undef HAS_CLOCK_GETTIME
+
+#endif
+
+
+#define GET_CLOCK_COUNT(x)  gettimeofday(x, NULL)
+
 
 #define MILLISECONDS_CONVERSION 1000
 #define MICROSECONDS_CONVERSION 1000000
+#define NANOECONDS_CONVERSION 1000000000
+
 
 /// Class to abstract socket communications in a cross platform manner.
 /// This class is designed
@@ -80,34 +101,26 @@ class CStatTimer {
     memset(&m_endTime, 0, sizeof(struct timeval));
   };
 
-  struct timeval GetStartTime() {
-    return m_startTime;
-  };
-  void SetStartTime() {
-    GET_CLOCK_COUNT(&m_startTime);
-  };
+  struct timeval GetStartTime() { return m_startTime; };
+  void SetStartTime() { GET_CLOCK_COUNT(&m_startTime); };
 
-  struct timeval GetEndTime() {
-    return m_endTime;
-  };
-  void SetEndTime() {
-    GET_CLOCK_COUNT(&m_endTime);
-  };
+  struct timeval GetEndTime() { return m_endTime; };
+  void SetEndTime() { GET_CLOCK_COUNT(&m_endTime); };
 
-  uint32_t GetMilliSeconds() {
-    return (CalcTotalUSec() / MILLISECONDS_CONVERSION);
-  };
-  uint64_t GetMicroSeconds() {
-    return (CalcTotalUSec());
-  };
-  uint32_t GetSeconds() {
-    return (CalcTotalUSec() / MICROSECONDS_CONVERSION);
-  };
+  uint32_t GetMilliSeconds() { return (CalcTotalUSec() / MILLISECONDS_CONVERSION); };
+  uint64_t GetMicroSeconds() { return (CalcTotalUSec()); };
+  uint32_t GetSeconds() { return (CalcTotalUSec() / MICROSECONDS_CONVERSION); };
 
   static uint64_t GetCurrentTime() {
-    struct timeval tmpTime;
-    GET_CLOCK_COUNT(&tmpTime);
-    return ((tmpTime.tv_sec * MICROSECONDS_CONVERSION) + tmpTime.tv_usec);
+#if HAS_CLOCK_GETTIME
+    struct timespec  tim;
+    clock_gettime(CLOCK_REALTIME, &tim);
+    return (uint64_t)(tim.tv_sec * 1000000000LL + tim.tv_nsec);
+#else
+    struct timeval timeofday;
+    gettimeofday(&timeofday, NULL);
+    return (uint64_t)(timeofday.tv_sec * 1000000000LL + timeofday.tv_usec * 1000);
+#endif
   };
 
  private:
