@@ -1,4 +1,4 @@
-YDLIDAR SDK PACKAGE V1.3.7
+YDLIDAR SDK PACKAGE V1.3.8
 =====================================================================
 
 SDK [test](https://github.com/yangfuyuan/sdk/tree/non-singleton) application for YDLIDAR
@@ -9,7 +9,7 @@ How to build YDLIDAR SDK samples
 =====================================================================
     $ git clone https://github.com/yangfuyuan/sdk
     $ cd sdk
-    $ git checkout non-singleton
+    $ git checkout master
     $ cd ..
     $ mkdir build
     $ cd build
@@ -129,6 +129,10 @@ code:
 
 Upgrade Log
 =====================================================================
+
+2019-04-15 version:1.3.8
+
+   1.fix time error.
 
 2018-10-15 version:1.3.7
 
