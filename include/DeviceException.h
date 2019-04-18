@@ -29,39 +29,43 @@
 #include <exception>
 #include <string>
 
-namespace ydlidar {
+namespace ydlidar
+{
 
 struct DeviceException : std::exception
 {
-    DeviceException(std::string str) : desc(str) {}
-    DeviceException(std::string str, std::string detail) {
-        desc = str + "\n\t" + detail;
-    }
-    ~DeviceException() throw() {}
-    const char* what() const throw() { return desc.c_str(); }
-    std::string desc;
+	DeviceException(std::string str) : desc(str) {}
+	DeviceException(std::string str, std::string detail)
+	{
+		desc = str + "\n\t" + detail;
+	}
+	~DeviceException() throw() {}
+	const char *what() const throw() { return desc.c_str(); }
+	std::string desc;
 };
 
 struct TimeoutException : std::exception
 {
-    TimeoutException(std::string str) : desc(str) {}
-    TimeoutException(std::string str, std::string detail) {
-        desc = str + "\n\t" + detail;
-    }
-    ~TimeoutException() throw() {}
-    const char* what() const throw() { return desc.c_str(); }
-    std::string desc;
+	TimeoutException(std::string str) : desc(str) {}
+	TimeoutException(std::string str, std::string detail)
+	{
+		desc = str + "\n\t" + detail;
+	}
+	~TimeoutException() throw() {}
+	const char *what() const throw() { return desc.c_str(); }
+	std::string desc;
 };
 
 
 struct CorruptedDataException : std::exception
 {
-    CorruptedDataException(std::string str) : desc(str) {}
-    CorruptedDataException(std::string str, std::string detail) {
-        desc = str + "\n\t" + detail;
-    }
-    ~CorruptedDataException() throw() {}
-    const char* what() const throw() { return desc.c_str(); }
-    std::string desc;
+	CorruptedDataException(std::string str) : desc(str) {}
+	CorruptedDataException(std::string str, std::string detail)
+	{
+		desc = str + "\n\t" + detail;
+	}
+	~CorruptedDataException() throw() {}
+	const char *what() const throw() { return desc.c_str(); }
+	std::string desc;
 };
 }

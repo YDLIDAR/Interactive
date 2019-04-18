@@ -42,88 +42,102 @@ using namespace ydlidar;
 using namespace std;
 
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv)
+{
 
-  std::string lidarIP;
-  std::string port;
-  ydlidar::init(argc, argv);
+	std::string lidarIP;
+	std::string port;
+	ydlidar::init(argc, argv);
 
 again:
-  printf("Please enter the lidar IP[192.168.0.11](yes):");
-  std::cin >> lidarIP;
-  regex reg("(\\d{1,3}).(\\d{1,3}).(\\d{1,3}).(\\d{1,3})");
-  smatch m;
+	printf("Please enter the lidar IP[192.168.0.11](yes):");
+	std::cin >> lidarIP;
+	regex reg("(\\d{1,3}).(\\d{1,3}).(\\d{1,3}).(\\d{1,3})");
+	smatch m;
 
-  if (!ydlidar::ok()) {
-    return 0;
-  }
+	if (!ydlidar::ok())
+	{
+		return 0;
+	}
 
-  if (lidarIP.find("yes") != std::string::npos) {
-    lidarIP = "192.168.0.11";
-  }
+	if (lidarIP.find("yes") != std::string::npos)
+	{
+		lidarIP = "192.168.0.11";
+	}
 
-  if (!regex_match(lidarIP, m, reg)) {
-    ydlidar::console.warning("ip address input error, please again.");
-    goto again;
-  }
+	if (!regex_match(lidarIP, m, reg))
+	{
+		ydlidar::console.warning("ip address input error, please again.");
+		goto again;
+	}
 
-  ydlidar::ETLidarDriver lidar;
-  lidarConfig config;
+	ydlidar::ETLidarDriver lidar;
+	lidarConfig config;
 
-  if (!lidar.getScanCfg(config, lidarIP)) {
-    return 0;
-  }
+	if (!lidar.getScanCfg(config, lidarIP))
+	{
+		return 0;
+	}
 
 
-  printf("Please enter the lidar port[%d](yes):", config.dataRecvPort);
-  std::cin >> port;
+	printf("Please enter the lidar port[%d](yes):", config.dataRecvPort);
+	std::cin >> port;
 
-  if (port.find("yes") == std::string::npos) {
-    config.dataRecvPort = atoi(port.c_str());
-  }
+	if (port.find("yes") == std::string::npos)
+	{
+		config.dataRecvPort = atoi(port.c_str());
+	}
 
-  if (!ydlidar::ok()) {
-    return 0;
-  }
+	if (!ydlidar::ok())
+	{
+		return 0;
+	}
 
-  printf("Please enter the lidar scan frequency[%dHZ](yes):",
-         config.motor_rpm / 60);
-  std::cin >> port;
+	printf("Please enter the lidar scan frequency[%dHZ](yes):",
+		   config.motor_rpm / 60);
+	std::cin >> port;
 
-  if (port.find("yes") == std::string::npos) {
-    config.motor_rpm = atoi(port.c_str()) * 60;
-  }
+	if (port.find("yes") == std::string::npos)
+	{
+		config.motor_rpm = atoi(port.c_str()) * 60;
+	}
 
-  if (!ydlidar::ok()) {
-    return 0;
-  }
+	if (!ydlidar::ok())
+	{
+		return 0;
+	}
 
-  lidar.updateScanCfg(config);
-  ydlidar::console.message("SDK Version: %s", SDK_VERSION);
+	lidar.updateScanCfg(config);
+	ydlidar::console.message("SDK Version: %s", SDK_VERSION);
 
-  result_t ans = lidar.connect(lidarIP, config.dataRecvPort);
+	result_t ans = lidar.connect(lidarIP, config.dataRecvPort);
 
-  if (!IS_OK(ans)) {
-    ydlidar::console.error("Failed to connecting lidar...");
-    return 0;
-  }
+	if (!IS_OK(ans))
+	{
+		ydlidar::console.error("Failed to connecting lidar...");
+		return 0;
+	}
 
-  bool rs = lidar.turnOn();
+	bool rs = lidar.turnOn();
 
-  while (rs && ydlidar::ok()) {
-    lidarData scan;
-    ans = lidar.grabScanData(scan);
+	while (rs && ydlidar::ok())
+	{
+		lidarData scan;
+		ans = lidar.grabScanData(scan);
 
-    if (IS_OK(ans)) {
-      ydlidar::console.message("scan recevied[%llu]: %d ranges [%f]hz",
-                               scan.system_timestamp, scan.data.size(), 1e9 / scan.scan_time);
-    } else {
-      ydlidar::console.warning("Failed to get scan data");
-    }
-  }
+		if (IS_OK(ans))
+		{
+			ydlidar::console.message("scan recevied[%llu]: %d ranges [%f]hz",
+									 scan.system_timestamp, scan.data.size(), 1e9 / scan.scan_time);
+		}
+		else
+		{
+			ydlidar::console.warning("Failed to get scan data");
+		}
+	}
 
-  lidar.turnOff();
-  lidar.disconnect();
-  ETLidarDriver::WSACleanUp();
-  return 0;
+	lidar.turnOff();
+	lidar.disconnect();
+	ETLidarDriver::WSACleanUp();
+	return 0;
 }
