@@ -89,7 +89,6 @@
 #define IPTOS_LOWDELAY  0x10
 
 #endif
-#include "Host.h"
 #include "StatTimer.h"
 #include "ChannelDevice.h"
 

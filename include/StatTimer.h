@@ -53,14 +53,13 @@
 #include <sys/time.h>
 #endif
 
-#include "Host.h"
 
 #if defined(_WIN32)
-#if !defined (_WINSOCK2API_)&& !defined(_WINSOCKAPI_)
+#if !defined (_WINSOCK2API_) && !defined(_WINSOCKAPI_)
 struct timeval {
-  long tv_sec;
-  long tv_usec;
-}
+  long    tv_sec;         /* seconds */
+  long    tv_usec;        /* and microseconds */
+};
 #endif
 
 inline static int gettimeofday(struct timeval* tv, void* tz) {
@@ -80,10 +79,7 @@ inline static int gettimeofday(struct timeval* tv, void* tz) {
 
 #define GET_CLOCK_COUNT(x)  gettimeofday(x, NULL)
 
-
-#define MILLISECONDS_CONVERSION 1000
-#define MICROSECONDS_CONVERSION 1000000
-#define NANOECONDS_CONVERSION 1000000000
+#include "v8stdint.h"
 
 
 /// Class to abstract socket communications in a cross platform manner.
