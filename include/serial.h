@@ -6,7 +6,6 @@
 #include <string>
 #include <cstring>
 #include <sstream>
-#include "v8stdint.h"
 #include "ChannelDevice.h"
 
 namespace serial {

@@ -44,7 +44,6 @@
 #define __CSTATTIMER_H__
 
 #include <string.h>
-
 #if defined(_WIN32)
 #include <Winsock2.h>
 #include <time.h>
@@ -52,6 +51,8 @@
 #include <stdio.h>
 #include <sys/time.h>
 #endif
+#include "v8stdint.h"
+#include "Host.h"
 
 
 #if defined(_WIN32)
@@ -78,8 +79,6 @@ inline static int gettimeofday(struct timeval* tv, void* tz) {
 
 
 #define GET_CLOCK_COUNT(x)  gettimeofday(x, NULL)
-
-#include "v8stdint.h"
 
 
 /// Class to abstract socket communications in a cross platform manner.

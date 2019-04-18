@@ -25,12 +25,38 @@ FILE(GLOB SDK_SRC
 	
 ENDIF()
 
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
 add_subdirectory(samples)
-
 add_library(ydlidar_driver SHARED ${SDK_SRC})
-#set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+add_library(ydlidar_driver_static STATIC ${SDK_SRC})
+
+SET_TARGET_PROPERTIES(ydlidar_driver_static PROPERTIES OUTPUT_NAME "ydlidar_driver")
+SET_TARGET_PROPERTIES(ydlidar_driver PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+SET_TARGET_PROPERTIES(ydlidar_driver_static PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 IF (WIN32)
-target_link_libraries(ydlidar_driver setupapi ws2_32)
+target_link_libraries(ydlidar_driver ws2_32 setupapi)
+target_link_libraries(ydlidar_driver_static ws2_32 setupapi)
 ELSE()
 target_link_libraries(ydlidar_driver rt pthread)
-ENDIF()                    
+target_link_libraries(ydlidar_driver_static  rt pthread)
+ENDIF()
+
+include_directories( ${CMAKE_BINARY_DIR} )
+
+INSTALL(TARGETS ydlidar_driver ydlidar_driver_static
+       RUNTIME DESTINATION bin
+       LIBRARY DESTINATION lib
+       ARCHIVE DESTINATION lib
+)
+
+install(FILES include/v8stdint.h
+    include/ChannelDevice.h
+    include/ydlidar_driver.h
+    include/ydlidar_protocol.h
+    include/utils.h
+    include/CYdlidar.h
+    include/ETLidarDriver.h
+    include/etlidar_protocol.h
+    include/locker.h
+    include/thread.h DESTINATION include)

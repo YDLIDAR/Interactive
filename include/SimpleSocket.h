@@ -78,6 +78,7 @@
 #include <sys/ioctl.h>
 #endif
 
+
 #if defined(_WIN32)
 #include <io.h>
 #include <winsock2.h>
@@ -89,8 +90,10 @@
 #define IPTOS_LOWDELAY  0x10
 
 #endif
+
 #include "StatTimer.h"
 #include "ChannelDevice.h"
+
 
 //-----------------------------------------------------------------------------
 // General class macro definitions and typedefs

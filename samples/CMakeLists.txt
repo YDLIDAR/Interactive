@@ -15,5 +15,15 @@ SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 ADD_EXECUTABLE(${PROJECT_NAME}
                main.cpp)
 
+ADD_EXECUTABLE(etlidar_test
+               example.cpp)
+
 # Add the required libraries for linking:
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ydlidar_driver)
+TARGET_LINK_LIBRARIES(etlidar_test ydlidar_driver)
+
+INSTALL(TARGETS etlidar_test ${PROJECT_NAME}
+       RUNTIME DESTINATION bin
+       LIBRARY DESTINATION lib
+       ARCHIVE DESTINATION lib
+)

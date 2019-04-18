@@ -6,10 +6,13 @@
 *  http://www.eaibot.com
 *
 */
+#include "ActiveSocket.h"
+#include "serial.h"
 #include "ydlidar_driver.h"
 #include "common.h"
 #include <math.h>
 using namespace impl;
+using namespace serial;
 
 namespace ydlidar {
 
