@@ -84,7 +84,7 @@ public:
 	* @brief Get current scan configuration.
 	* @returns scanCfg structure.
 	*/
-	bool getScanCfg(lidarConfig &config, const std::string &ip_address = "");
+	int getScanCfg(lidarConfig &config, const std::string &ip_address = "");
 
 	/**
 	* @brief Get current scan update configuration.

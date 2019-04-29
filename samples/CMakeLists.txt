@@ -19,8 +19,8 @@ ADD_EXECUTABLE(etlidar_test
                example.cpp)
 
 # Add the required libraries for linking:
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ydlidar_driver)
-TARGET_LINK_LIBRARIES(etlidar_test ydlidar_driver)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ydlidar_driver_static)
+TARGET_LINK_LIBRARIES(etlidar_test ydlidar_driver_static)
 
 INSTALL(TARGETS etlidar_test ${PROJECT_NAME}
        RUNTIME DESTINATION bin

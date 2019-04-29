@@ -51,7 +51,7 @@ INSTALL(TARGETS ydlidar_driver ydlidar_driver_static
 )
 
 install(FILES include/v8stdint.h
-    include/ChannelDevice.h
+    include/LidarChannelDevice.h
     include/ydlidar_driver.h
     include/ydlidar_protocol.h
     include/utils.h

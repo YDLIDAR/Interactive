@@ -57,6 +57,8 @@ ETLidarDriver::ETLidarDriver() :
 	socket_cmd->SetConnectTimeout(DEFAULT_CONNECT_TIMEOUT_SEC,
 								  DEFAULT_CONNECT_TIMEOUT_USEC);
 	global_scan_data.data.clear();
+	m_config.motor_rpm = 1200;
+	m_config.laserScanFrequency = 50;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -165,35 +167,12 @@ bool ETLidarDriver::configPortConnect(const char *lidarIP, int tcpPort)
 {
 
 	ScopedLocker lock(_cmd_lock);
-
 	if (!socket_cmd)
 	{
 		return false;
 	}
-
-	if (!socket_cmd->IsSocketValid())
-	{
-		if (!socket_cmd->Initialize())
-		{
-			return false;
-		}
-	}
-	else
-	{
-		return socket_cmd->IsSocketValid();
-	}
-
-	socket_cmd->SetNonblocking();
-
-	if (!socket_cmd->Open(lidarIP, tcpPort))
-	{
-		socket_cmd->Close();
-		return false;
-	}
-
-	socket_cmd->SetReceiveTimeout(DEFAULT_TIMEOUT, 0);
-	socket_cmd->SetBlocking();
-	return socket_cmd->IsSocketValid();
+	socket_cmd->bindport(lidarIP, tcpPort);
+	return socket_cmd->open();
 }
 
 void ETLidarDriver::disConfigConnect()
@@ -205,7 +184,7 @@ void ETLidarDriver::disConfigConnect()
 		return;
 	}
 
-	socket_cmd->Close();
+	socket_cmd->closePort();
 }
 
 void ETLidarDriver::disconnect()
@@ -399,30 +378,22 @@ char *ETLidarDriver::configMessage(const char *descriptor, char *value)
 
 	memset(buf, 0, sizeof(buf));
 
-	if (socket_cmd->Select(0, 50000))
-	{
-		socket_cmd->Receive(sizeof(buf), reinterpret_cast<uint8_t *>(buf));
+	socket_cmd->Receive(sizeof(buf), reinterpret_cast<uint8_t *>(buf));
 
-		if (2 == sscanf(buf, "%[^=]=%[^=]", recvDesc, recvValue))
+	if (2 == sscanf(buf, "%[^=]=%[^=]", recvDesc, recvValue))
+	{
+		if (!strcmp(transDesc, recvDesc))
 		{
-			if (!strcmp(transDesc, recvDesc))
-			{
-				return recvValue;
-			}
-			else
-			{
-				return NULL;
-			}
+			return recvValue;
 		}
 		else
 		{
 			return NULL;
 		}
-
 	}
 	else
 	{
-		return value;
+		return NULL;
 	}
 
 	return NULL;
@@ -466,10 +437,10 @@ lidarConfig ETLidarDriver::getFinishedScanCfg()
 	return m_config;
 }
 
-bool ETLidarDriver::getScanCfg(lidarConfig &config,
-							   const std::string &ip_address)
+int ETLidarDriver::getScanCfg(lidarConfig &config,
+							  const std::string &ip_address)
 {
-	bool ret = false;
+	int ret = -2;
 
 	if (!ip_address.empty())
 	{
@@ -482,6 +453,7 @@ bool ETLidarDriver::getScanCfg(lidarConfig &config,
 	{
 		ydlidar::console.error("%s", DescribeError());
 		config = m_config;
+		ret = -1;
 		return  ret;
 	}
 
@@ -490,7 +462,7 @@ bool ETLidarDriver::getScanCfg(lidarConfig &config,
 	if (result != NULL)
 	{
 		cfg.laser_en = atoi(result);
-		ret = true;
+		ret = 0;
 	}
 
 	result = configMessage(valName(cfg.motor_en));
@@ -498,7 +470,7 @@ bool ETLidarDriver::getScanCfg(lidarConfig &config,
 	if (result != NULL)
 	{
 		cfg.motor_en = atoi(result);
-		ret = true;
+		ret = 0;
 	}
 
 	result = configMessage(valName(cfg.motor_rpm));
@@ -506,7 +478,7 @@ bool ETLidarDriver::getScanCfg(lidarConfig &config,
 	if (result != NULL)
 	{
 		cfg.motor_rpm = atoi(result);
-		ret = true;
+		ret = 0;
 	}
 
 	result = configMessage(valName(cfg.fov_start));
@@ -514,7 +486,7 @@ bool ETLidarDriver::getScanCfg(lidarConfig &config,
 	if (result != NULL)
 	{
 		cfg.fov_start = atoi(result);
-		ret = true;
+		ret = 0;
 	}
 
 	result = configMessage(valName(cfg.fov_end));
@@ -522,7 +494,7 @@ bool ETLidarDriver::getScanCfg(lidarConfig &config,
 	if (result != NULL)
 	{
 		cfg.fov_end = atoi(result);
-		ret = true;
+		ret = 0;
 	}
 
 	result = configMessage(valName(cfg.trans_sel));
@@ -530,7 +502,7 @@ bool ETLidarDriver::getScanCfg(lidarConfig &config,
 	if (result != NULL)
 	{
 		cfg.trans_sel = atoi(result);
-		ret = true;
+		ret = 0;
 	}
 
 	result = configMessage(valName(cfg.dataRecvPort));
@@ -538,7 +510,7 @@ bool ETLidarDriver::getScanCfg(lidarConfig &config,
 	if (result != NULL)
 	{
 		cfg.dataRecvPort = atoi(result);
-		ret = true;
+		ret = 0;
 	}
 
 
@@ -547,7 +519,7 @@ bool ETLidarDriver::getScanCfg(lidarConfig &config,
 	if (result != NULL)
 	{
 		cfg.dhcp_en = atoi(result);
-		ret = true;
+		ret = 0;
 	}
 
 	result = configMessage(valName(cfg.dataRecvIp));
@@ -555,7 +527,7 @@ bool ETLidarDriver::getScanCfg(lidarConfig &config,
 	if (result != NULL)
 	{
 		strcpy(cfg.dataRecvIp, result);
-		ret = true;
+		ret = 0;
 	}
 
 	result = configMessage(valName(cfg.deviceIp));
@@ -563,7 +535,7 @@ bool ETLidarDriver::getScanCfg(lidarConfig &config,
 	if (result != NULL)
 	{
 		strcpy(cfg.deviceIp, result);
-		ret = true;
+		ret = 0;
 	}
 
 	result = configMessage(valName(cfg.deviceNetmask));
@@ -571,7 +543,7 @@ bool ETLidarDriver::getScanCfg(lidarConfig &config,
 	if (result != NULL)
 	{
 		strcpy(cfg.deviceNetmask, result);
-		ret = true;
+		ret = 0;
 	}
 
 
@@ -580,7 +552,7 @@ bool ETLidarDriver::getScanCfg(lidarConfig &config,
 	if (result != NULL)
 	{
 		strcpy(cfg.deviceGatewayIp, result);
-		ret = true;
+		ret = 0;
 	}
 
 	result = configMessage(valName(cfg.laserScanFrequency));
@@ -589,10 +561,15 @@ bool ETLidarDriver::getScanCfg(lidarConfig &config,
 	{
 		cfg.laserScanFrequency = atoi(result);
 		m_sampleRate = 1000 / cfg.laserScanFrequency * 1000;
-		ret = true;
+		ret = 0;
+	}
+	else
+	{
+		cfg.laserScanFrequency = 50;
+		m_sampleRate = 1000 / cfg.laserScanFrequency * 1000;
 	}
 
-	if (ret)
+	if (ret == 0)
 	{
 		m_config = cfg;
 		config = cfg;

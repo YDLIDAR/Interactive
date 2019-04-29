@@ -68,10 +68,9 @@ typedef int            SOCKET;
 
 
 #if defined(_WIN32)
-struct iovec
-{
-	void  *iov_base;
-	size_t iov_len;
+struct iovec {
+  void*  iov_base;
+  size_t iov_len;
 };
 
 #endif
