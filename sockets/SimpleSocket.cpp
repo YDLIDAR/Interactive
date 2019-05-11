@@ -201,11 +201,17 @@ int CSimpleSocket::waitfordata(size_t data_count, uint32_t timeout, size_t* retu
 }
 
 size_t CSimpleSocket::writeData(const uint8_t* data, size_t size) {
-  return Send(data, size);
+  int32_t sz = Send(data, size);
+  if(sz < 0)
+    return 0;
+  return sz;
 }
 
 size_t CSimpleSocket::readData(uint8_t* data, size_t size) {
-  return (size_t)Receive(size, data);
+  int32_t rz = Receive(size, data);
+  if(rz < 0)
+    return 0;
+  return rz;
 }
 
 
