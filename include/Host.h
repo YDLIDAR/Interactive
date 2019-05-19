@@ -210,7 +210,7 @@ typedef int socklen_t;
 #define DEFAULT_CONNECTION_TIMEOUT_USEC 0
 
 #define DEFAULT_REV_TIMEOUT_SEC 2
-#define DEFAULT_REV_TIMEOUT_USEC 0
+#define DEFAULT_REV_TIMEOUT_USEC 200000000
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */

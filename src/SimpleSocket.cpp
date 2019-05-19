@@ -463,7 +463,7 @@ int32_t CSimpleSocket::Send(const uint8_t* pBuf, size_t bytesToSend) {
           do {
             m_timer.SetEndTime();
 
-            if (m_timer.GetMilliSeconds() > DEFAULT_REV_TIMEOUT_SEC * 1000) {
+            if (m_timer.GetMilliSeconds() > (DEFAULT_REV_TIMEOUT_SEC * 1000 + DEFAULT_REV_TIMEOUT_USEC/1000000)) {
               SetSocketError(CSimpleSocket::SocketTimedout);
               break;
             }
@@ -805,7 +805,7 @@ int32_t CSimpleSocket::Receive(int32_t nMaxBytes, uint8_t* pBuffer) {
       do {
         m_timer.SetEndTime();
 
-        if (m_timer.GetMilliSeconds() > DEFAULT_REV_TIMEOUT_SEC * 1000) {
+        if (m_timer.GetMilliSeconds() > (DEFAULT_REV_TIMEOUT_SEC * 1000 + DEFAULT_REV_TIMEOUT_USEC / 1000000)) {
           SetSocketError(CSimpleSocket::SocketTimedout);
           break;
         }
@@ -832,7 +832,7 @@ int32_t CSimpleSocket::Receive(int32_t nMaxBytes, uint8_t* pBuffer) {
         do {
           m_timer.SetEndTime();
 
-          if (m_timer.GetMilliSeconds() > DEFAULT_REV_TIMEOUT_SEC * 1000) {
+          if (m_timer.GetMilliSeconds() > (DEFAULT_REV_TIMEOUT_SEC * 1000 + DEFAULT_REV_TIMEOUT_USEC / 1000000)) {
             SetSocketError(CSimpleSocket::SocketTimedout);
             break;
           }
@@ -849,7 +849,7 @@ int32_t CSimpleSocket::Receive(int32_t nMaxBytes, uint8_t* pBuffer) {
         do {
           m_timer.SetEndTime();
 
-          if (m_timer.GetMilliSeconds() > DEFAULT_REV_TIMEOUT_SEC * 1000) {
+          if (m_timer.GetMilliSeconds() > (DEFAULT_REV_TIMEOUT_SEC * 1000 + DEFAULT_REV_TIMEOUT_USEC / 1000000)) {
             SetSocketError(CSimpleSocket::SocketTimedout);
             break;
           }
