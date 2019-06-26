@@ -204,7 +204,7 @@ size_t CSimpleSocket::writeData(const uint8_t* data, size_t size) {
   int32_t sz = Send(data, size);
   if(sz < 0)
     return 0;
-  return rz;
+  return sz;
 }
 
 size_t CSimpleSocket::readData(uint8_t* data, size_t size) {
