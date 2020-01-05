@@ -52,7 +52,8 @@ CSimpleSocket::CSimpleSocket(CSocketType nType) :
   m_nSocketType(SocketTypeInvalid), m_nBytesReceived(-1),
   m_nBytesSent(-1), m_nFlags(0),
   m_bIsBlocking(true), m_open(false) {
-  SetConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_SEC, DEFAULT_CONNECTION_TIMEOUT_USEC);
+  SetConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_SEC,
+                    DEFAULT_CONNECTION_TIMEOUT_USEC);
   memset(&m_stRecvTimeout, 0, sizeof(struct timeval));
   memset(&m_stSendTimeout, 0, sizeof(struct timeval));
   memset(&m_stLinger, 0, sizeof(struct linger));
@@ -108,13 +109,13 @@ CSimpleSocket::CSimpleSocket(CSocketType nType) :
   }
 }
 
-CSimpleSocket::CSimpleSocket(CSimpleSocket& socket) {
+CSimpleSocket::CSimpleSocket(CSimpleSocket &socket) {
   m_pBuffer = new uint8_t[socket.m_nBufferSize];
   m_nBufferSize = socket.m_nBufferSize;
   memcpy(m_pBuffer, socket.m_pBuffer, socket.m_nBufferSize);
 }
 
-CSimpleSocket* CSimpleSocket::operator=(CSimpleSocket& socket) {
+CSimpleSocket *CSimpleSocket::operator=(CSimpleSocket &socket) {
   if (m_nBufferSize != socket.m_nBufferSize) {
     delete m_pBuffer;
     m_pBuffer = new uint8_t[socket.m_nBufferSize];
@@ -128,14 +129,16 @@ CSimpleSocket* CSimpleSocket::operator=(CSimpleSocket& socket) {
 
 void CSimpleSocket::WSACleanUp() {
 #if defined(_WIN32)
+
   if (m_WSAStartup) {
     WSACleanup();
     m_WSAStartup = false;
   }
+
 #endif
 }
 
-bool CSimpleSocket::bindport(const char* addr, uint32_t port) {
+bool CSimpleSocket::bindport(const char *addr, uint32_t port) {
   m_addr = addr;
   m_port = port;
   bool was_open = this->isOpen();
@@ -145,7 +148,8 @@ bool CSimpleSocket::bindport(const char* addr, uint32_t port) {
   }
 
   DisableNagleAlgoritm();
-  SetConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_SEC, DEFAULT_CONNECTION_TIMEOUT_USEC);
+  SetConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_SEC,
+                    DEFAULT_CONNECTION_TIMEOUT_USEC);
   SetReceiveTimeout(DEFAULT_REV_TIMEOUT_SEC, DEFAULT_REV_TIMEOUT_USEC);
   SetSendTimeout(DEFAULT_REV_TIMEOUT_SEC, DEFAULT_REV_TIMEOUT_USEC);
   //Flush();
@@ -164,9 +168,16 @@ bool CSimpleSocket::open() {
   SetNonblocking();
   m_open = Open(m_addr.c_str(), m_port);
   SetNonblocking();
+
+  if (m_open) {
+    SetReceiveTimeout(DEFAULT_REV_TIMEOUT_SEC, DEFAULT_REV_TIMEOUT_USEC);
+    SetSendTimeout(DEFAULT_REV_TIMEOUT_SEC, DEFAULT_REV_TIMEOUT_USEC);
+  }
+
   if (!m_open) {
     Close();
   }
+
   return m_open;
 }
 
@@ -188,7 +199,7 @@ void CSimpleSocket::flush() {
     int ret = waitfordata(1024, 2000, &size);
 
     if (size > 0) {
-      uint8_t* buf = new uint8_t[size];
+      uint8_t *buf = new uint8_t[size];
       readData(buf, size);
       delete[] buf;
     }
@@ -196,21 +207,28 @@ void CSimpleSocket::flush() {
   }
 }
 
-int CSimpleSocket::waitfordata(size_t data_count, uint32_t timeout, size_t* returned_size) {
+int CSimpleSocket::waitfordata(size_t data_count, uint32_t timeout,
+                               size_t *returned_size) {
   return WaitForData(data_count, timeout, returned_size);
 }
 
-size_t CSimpleSocket::writeData(const uint8_t* data, size_t size) {
+size_t CSimpleSocket::writeData(const uint8_t *data, size_t size) {
   int32_t sz = Send(data, size);
-  if(sz < 0)
+
+  if (sz < 0) {
     return 0;
+  }
+
   return sz;
 }
 
-size_t CSimpleSocket::readData(uint8_t* data, size_t size) {
+size_t CSimpleSocket::readData(uint8_t *data, size_t size) {
   int32_t rz = Receive(size, data);
-  if(rz < 0)
+
+  if (rz < 0) {
     return 0;
+  }
+
   return rz;
 }
 
@@ -226,17 +244,21 @@ bool CSimpleSocket::Initialize() {
   errno = CSimpleSocket::SocketSuccess;
 
 #if defined(_WIN32)
+
   //-------------------------------------------------------------------------
   // Data structure containing general Windows Sockets Info
   //-------------------------------------------------------------------------
   if (!m_WSAStartup) {
     memset(&m_hWSAData, 0, sizeof(m_hWSAData));
+
     if (WSAStartup(MAKEWORD(2, 2), &m_hWSAData) != 0) {
       TranslateSocketError();
       return (IsSocketValid());
     }
+
     m_WSAStartup = true;
   }
+
 #endif
 
   //-------------------------------------------------------------------------
@@ -258,7 +280,7 @@ bool CSimpleSocket::Initialize() {
 // BindInterface()
 //
 //------------------------------------------------------------------------------
-bool CSimpleSocket::BindInterface(const char* pInterface) {
+bool CSimpleSocket::BindInterface(const char *pInterface) {
   bool           bRetVal = false;
   struct in_addr stInterfaceAddr;
 
@@ -290,7 +312,7 @@ bool CSimpleSocket::SetMulticast(bool bEnable, uint8_t multicastTTL) {
   if (GetSocketType() == CSimpleSocket::SocketTypeUdp) {
     m_bIsMulticast = bEnable;
 
-    if (SETSOCKOPT(m_socket, IPPROTO_IP, IP_MULTICAST_TTL, (void*)&multicastTTL,
+    if (SETSOCKOPT(m_socket, IPPROTO_IP, IP_MULTICAST_TTL, (void *)&multicastTTL,
                    sizeof(multicastTTL)) == SocketError) {
       TranslateSocketError();
       bRetVal = false;
@@ -317,7 +339,8 @@ bool CSimpleSocket::SetSocketDscp(int32_t nDscp) {
   nTempVal /= 4;
 
   if (IsSocketValid()) {
-    if (SETSOCKOPT(m_socket, IPPROTO_IP, IP_TOS, &nTempVal, sizeof(nTempVal)) == SocketError) {
+    if (SETSOCKOPT(m_socket, IPPROTO_IP, IP_TOS, &nTempVal,
+                   sizeof(nTempVal)) == SocketError) {
       TranslateSocketError();
       bRetVal = false;
     }
@@ -380,14 +403,16 @@ uint32_t CSimpleSocket::GetWindowSize(uint32_t nOptionName) {
 // SetWindowSize()
 //
 //------------------------------------------------------------------------------
-uint32_t CSimpleSocket::SetWindowSize(uint32_t nOptionName, uint32_t nWindowSize) {
+uint32_t CSimpleSocket::SetWindowSize(uint32_t nOptionName,
+                                      uint32_t nWindowSize) {
   uint32_t nRetVal = 0;
 
   //-------------------------------------------------------------------------
   // no socket given, return system default allocate our own new socket
   //-------------------------------------------------------------------------
   if (m_socket != CSimpleSocket::SocketError) {
-    nRetVal = SETSOCKOPT(m_socket, SOL_SOCKET, nOptionName, &nWindowSize, sizeof(nWindowSize));
+    nRetVal = SETSOCKOPT(m_socket, SOL_SOCKET, nOptionName, &nWindowSize,
+                         sizeof(nWindowSize));
     TranslateSocketError();
   } else {
     SetSocketError(CSimpleSocket::SocketInvalidSocket);
@@ -409,7 +434,8 @@ bool CSimpleSocket::DisableNagleAlgoritm() {
   //----------------------------------------------------------------------
   // Set TCP NoDelay flag to true
   //----------------------------------------------------------------------
-  if (SETSOCKOPT(m_socket, IPPROTO_TCP, TCP_NODELAY, &nTcpNoDelay, sizeof(int32_t)) == 0) {
+  if (SETSOCKOPT(m_socket, IPPROTO_TCP, TCP_NODELAY, &nTcpNoDelay,
+                 sizeof(int32_t)) == 0) {
     bRetVal = true;
   }
 
@@ -430,7 +456,8 @@ bool CSimpleSocket::EnableNagleAlgoritm() {
   //----------------------------------------------------------------------
   // Set TCP NoDelay flag to false
   //----------------------------------------------------------------------
-  if (SETSOCKOPT(m_socket, IPPROTO_TCP, TCP_NODELAY, &nTcpNoDelay, sizeof(int32_t)) == 0) {
+  if (SETSOCKOPT(m_socket, IPPROTO_TCP, TCP_NODELAY, &nTcpNoDelay,
+                 sizeof(int32_t)) == 0) {
     bRetVal = true;
   }
 
@@ -444,7 +471,7 @@ bool CSimpleSocket::EnableNagleAlgoritm() {
 // Send() - Send data on a valid socket
 //
 //------------------------------------------------------------------------------
-int32_t CSimpleSocket::Send(const uint8_t* pBuf, size_t bytesToSend) {
+int32_t CSimpleSocket::Send(const uint8_t *pBuf, size_t bytesToSend) {
   SetSocketError(SocketSuccess);
   m_nBytesSent = 0;
 
@@ -500,7 +527,8 @@ int32_t CSimpleSocket::Send(const uint8_t* pBuf, size_t bytesToSend) {
           //                    else
           {
             do {
-              m_nBytesSent = SENDTO(m_socket, pBuf, bytesToSend, 0, (const sockaddr*)&m_stServerSockaddr,
+              m_nBytesSent = SENDTO(m_socket, pBuf, bytesToSend, 0,
+                                    (const sockaddr *)&m_stServerSockaddr,
                                     sizeof(m_stServerSockaddr));
               TranslateSocketError();
             } while (GetSocketError() == CSimpleSocket::SocketInterrupted);
@@ -583,11 +611,13 @@ bool CSimpleSocket::Flush() {
   //--------------------------------------------------------------------------
   // Get the current setting of the TCP_NODELAY flag.
   //--------------------------------------------------------------------------
-  if (GETSOCKOPT(m_socket, IPPROTO_TCP, TCP_NODELAY, &nCurFlags, sizeof(int32_t)) == 0) {
+  if (GETSOCKOPT(m_socket, IPPROTO_TCP, TCP_NODELAY, &nCurFlags,
+                 sizeof(int32_t)) == 0) {
     //----------------------------------------------------------------------
     // Set TCP NoDelay flag
     //----------------------------------------------------------------------
-    if (SETSOCKOPT(m_socket, IPPROTO_TCP, TCP_NODELAY, &nTcpNoDelay, sizeof(int32_t)) == 0) {
+    if (SETSOCKOPT(m_socket, IPPROTO_TCP, TCP_NODELAY, &nTcpNoDelay,
+                   sizeof(int32_t)) == 0) {
       //------------------------------------------------------------------
       // Send empty byte stream to flush the TCP send buffer
       //------------------------------------------------------------------
@@ -613,7 +643,7 @@ bool CSimpleSocket::Flush() {
 // Writev -
 //
 //------------------------------------------------------------------------------
-int32_t CSimpleSocket::Writev(const struct iovec* pVector, size_t nCount) {
+int32_t CSimpleSocket::Writev(const struct iovec *pVector, size_t nCount) {
   int32_t nBytes     = 0;
   int32_t nBytesSent = 0;
   int32_t i          = 0;
@@ -623,7 +653,7 @@ int32_t CSimpleSocket::Writev(const struct iovec* pVector, size_t nCount) {
   // function call.
   //--------------------------------------------------------------------------
   for (i = 0; i < (int32_t)nCount; i++) {
-    if ((nBytes = Send((uint8_t*)pVector[i].iov_base,
+    if ((nBytes = Send((uint8_t *)pVector[i].iov_base,
                        pVector[i].iov_len)) == CSimpleSocket::SocketError) {
       break;
     }
@@ -644,11 +674,12 @@ int32_t CSimpleSocket::Writev(const struct iovec* pVector, size_t nCount) {
 // Send() - Send data on a valid socket via a vector of buffers.
 //
 //------------------------------------------------------------------------------
-int32_t CSimpleSocket::Send(const struct iovec* sendVector, int32_t nNumItems) {
+int32_t CSimpleSocket::Send(const struct iovec *sendVector, int32_t nNumItems) {
   SetSocketError(SocketSuccess);
   m_nBytesSent = 0;
 
-  if ((m_nBytesSent = WRITEV(m_socket, sendVector, nNumItems)) == CSimpleSocket::SocketError) {
+  if ((m_nBytesSent = WRITEV(m_socket, sendVector,
+                             nNumItems)) == CSimpleSocket::SocketError) {
     TranslateSocketError();
   }
 
@@ -661,10 +692,15 @@ int32_t CSimpleSocket::Send(const struct iovec* sendVector, int32_t nNumItems) {
 // SetReceiveTimeout()
 //
 //------------------------------------------------------------------------------
-bool CSimpleSocket::SetReceiveTimeout(int32_t nRecvTimeoutSec, int32_t nRecvTimeoutUsec) {
+bool CSimpleSocket::SetReceiveTimeout(int32_t nRecvTimeoutSec,
+                                      int32_t nRecvTimeoutUsec) {
   bool bRetVal = true;
   memset(&m_stRecvTimeout, 0, sizeof(struct timeval));
+#if defined(_WIN32)
+  m_stRecvTimeout.tv_sec = nRecvTimeoutSec * 1000;
+#else
   m_stRecvTimeout.tv_sec = nRecvTimeoutSec;
+#endif
   m_stRecvTimeout.tv_usec = nRecvTimeoutUsec;
 
   //--------------------------------------------------------------------------
@@ -685,10 +721,15 @@ bool CSimpleSocket::SetReceiveTimeout(int32_t nRecvTimeoutSec, int32_t nRecvTime
 // SetSendTimeout()
 //
 //------------------------------------------------------------------------------
-bool CSimpleSocket::SetSendTimeout(int32_t nSendTimeoutSec, int32_t nSendTimeoutUsec) {
+bool CSimpleSocket::SetSendTimeout(int32_t nSendTimeoutSec,
+                                   int32_t nSendTimeoutUsec) {
   bool bRetVal = true;
   memset(&m_stSendTimeout, 0, sizeof(struct timeval));
+#if defined(_WIN32)
+  m_stSendTimeout.tv_sec = nSendTimeoutSec * 1000;
+#else
   m_stSendTimeout.tv_sec = nSendTimeoutSec;
+#endif
   m_stSendTimeout.tv_usec = nSendTimeoutUsec;
 
   //--------------------------------------------------------------------------
@@ -713,7 +754,8 @@ bool CSimpleSocket::SetOptionReuseAddr() {
   bool  bRetVal = false;
   int32_t nReuse  = IPTOS_LOWDELAY;
 
-  if (SETSOCKOPT(m_socket, SOL_SOCKET, SO_REUSEADDR, (char*)&nReuse, sizeof(int32_t)) == 0) {
+  if (SETSOCKOPT(m_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&nReuse,
+                 sizeof(int32_t)) == 0) {
     bRetVal = true;
   }
 
@@ -732,7 +774,8 @@ bool CSimpleSocket::SetOptionLinger(bool bEnable, uint16_t nTime) {
   m_stLinger.l_onoff = (bEnable == true) ? 1 : 0;
   m_stLinger.l_linger = nTime;
 
-  if (SETSOCKOPT(m_socket, SOL_SOCKET, SO_LINGER, &m_stLinger, sizeof(m_stLinger)) == 0) {
+  if (SETSOCKOPT(m_socket, SOL_SOCKET, SO_LINGER, &m_stLinger,
+                 sizeof(m_stLinger)) == 0) {
     bRetVal = true;
   }
 
@@ -750,7 +793,7 @@ bool CSimpleSocket::SetOptionLinger(bool bEnable, uint16_t nTime) {
 //             of scope.
 //
 //------------------------------------------------------------------------------
-int32_t CSimpleSocket::Receive(int32_t nMaxBytes, uint8_t* pBuffer) {
+int32_t CSimpleSocket::Receive(int32_t nMaxBytes, uint8_t *pBuffer) {
   m_nBytesReceived = 0;
 
   //--------------------------------------------------------------------------
@@ -760,11 +803,7 @@ int32_t CSimpleSocket::Receive(int32_t nMaxBytes, uint8_t* pBuffer) {
     return m_nBytesReceived;
   }
 
-  if (!SetNonblocking()) {
-    return m_nBytesReceived;
-  }
-
-  uint8_t* pWorkBuffer = pBuffer;
+  uint8_t *pWorkBuffer = pBuffer;
 
   if (pBuffer == NULL) {
     //--------------------------------------------------------------------------
@@ -791,9 +830,6 @@ int32_t CSimpleSocket::Receive(int32_t nMaxBytes, uint8_t* pBuffer) {
 
   m_timer.Initialize();
   m_timer.SetStartTime();
-  fd_set recvfds;
-  struct timeval timeout;
-  int nNumDescriptors = -1;
 
   switch (m_nSocketType) {
     //----------------------------------------------------------------------
@@ -809,22 +845,6 @@ int32_t CSimpleSocket::Receive(int32_t nMaxBytes, uint8_t* pBuffer) {
           break;
         }
 
-        FD_ZERO(&recvfds);
-        FD_SET(m_socket, &recvfds);
-        timeout.tv_sec = DEFAULT_REV_TIMEOUT_SEC;
-        timeout.tv_usec = DEFAULT_REV_TIMEOUT_USEC;
-        nNumDescriptors = SELECT((m_socket + 1), &m_readFds, NULL, NULL, &timeout);
-
-        if (nNumDescriptors <= 0) {
-          printf("select: %d", nNumDescriptors);
-
-          if (!SetBlocking()) {
-            printf("set Blocking  failed\n");
-          }
-
-          break;
-        }
-
         m_nBytesReceived = RECV(m_socket, (pWorkBuffer + m_nBytesReceived),
                                 nMaxBytes, m_nFlags);
         TranslateSocketError();
@@ -834,17 +854,19 @@ int32_t CSimpleSocket::Receive(int32_t nMaxBytes, uint8_t* pBuffer) {
         }
 
         if (m_nBytesReceived <= 0) {
-          if (!SetBlocking()) {
-            printf("set Blocking  failed\n");
-          }
+          if (GetSocketError() == CSimpleSocket::SocketTimedout) {
+            m_timer.SetEndTime();
 
-          break;
+            if (m_timer.GetMilliSeconds() > DEFAULT_REV_TIMEOUT_SEC * 1000) {
+              SetSocketError(CSimpleSocket::SocketTimedout);
+              break;
+            }
+          }
         }
+
+
       } while ((GetSocketError() == CSimpleSocket::SocketInterrupted));
 
-      if (!SetBlocking()) {
-        printf("set Blocking  failed\n");
-      }
 
       break;
     }
@@ -926,7 +948,7 @@ bool CSimpleSocket::SetNonblocking(void) {
 #if defined(_WIN32)
   nCurFlags = 1;
 
-  if (ioctlsocket(m_socket, FIONBIO, (ULONG*)&nCurFlags) != 0) {
+  if (ioctlsocket(m_socket, FIONBIO, (ULONG *)&nCurFlags) != 0) {
     TranslateSocketError();
     return false;
   }
@@ -961,7 +983,7 @@ bool CSimpleSocket::SetBlocking(void) {
 #if defined(_WIN32)
   nCurFlags = 0;
 
-  if (ioctlsocket(m_socket, FIONBIO, (ULONG*)&nCurFlags) != 0) {
+  if (ioctlsocket(m_socket, FIONBIO, (ULONG *)&nCurFlags) != 0) {
     return false;
   }
 
@@ -990,7 +1012,8 @@ bool CSimpleSocket::SetBlocking(void) {
 // SendFile() - stands-in for system provided sendfile
 //
 //------------------------------------------------------------------------------
-int32_t CSimpleSocket::SendFile(int32_t nOutFd, int32_t nInFd, off_t* pOffset, int32_t nCount) {
+int32_t CSimpleSocket::SendFile(int32_t nOutFd, int32_t nInFd, off_t *pOffset,
+                                int32_t nCount) {
   int32_t  nOutCount = CSimpleSocket::SocketError;
   static char szData[SOCKET_SENDFILE_BLOCKSIZE];
   int32_t       nInCount = 0;
@@ -1000,7 +1023,8 @@ int32_t CSimpleSocket::SendFile(int32_t nOutFd, int32_t nInFd, off_t* pOffset, i
   }
 
   while (nOutCount < nCount) {
-    nInCount = (nCount - nOutCount) < SOCKET_SENDFILE_BLOCKSIZE ? (nCount - nOutCount) :
+    nInCount = (nCount - nOutCount) < SOCKET_SENDFILE_BLOCKSIZE ?
+               (nCount - nOutCount) :
                SOCKET_SENDFILE_BLOCKSIZE;
 
     if ((read(nInFd, szData, nInCount)) != (int32_t)nInCount) {
@@ -1179,7 +1203,7 @@ void CSimpleSocket::TranslateSocketError(void) {
 //
 //------------------------------------------------------------------------------
 
-const char* CSimpleSocket::DescribeError(CSocketError err) {
+const char *CSimpleSocket::DescribeError(CSocketError err) {
   switch (err) {
     case CSimpleSocket::SocketError:
       return "Generic socket error translates to error below.";
@@ -1250,7 +1274,7 @@ const char* CSimpleSocket::DescribeError(CSocketError err) {
 //------------------------------------------------------------------------------
 bool CSimpleSocket::Select(int32_t nTimeoutSec, int32_t nTimeoutUSec) {
   bool            bRetVal = false;
-  struct timeval* pTimeout = NULL;
+  struct timeval *pTimeout = NULL;
   struct timeval  timeout;
   int32_t           nNumDescriptors = -1;
   int32_t           nError = 0;
@@ -1273,7 +1297,8 @@ bool CSimpleSocket::Select(int32_t nTimeoutSec, int32_t nTimeoutUSec) {
     pTimeout = &timeout;
   }
 
-  nNumDescriptors = SELECT(m_socket + 1, &m_readFds, &m_writeFds, &m_errorFds, pTimeout);
+  nNumDescriptors = SELECT(m_socket + 1, &m_readFds, &m_writeFds, &m_errorFds,
+                           pTimeout);
 //    nNumDescriptors = SELECT(m_socket+1, &m_readFds, NULL, NULL, pTimeout);
 
   //----------------------------------------------------------------------
@@ -1286,7 +1311,8 @@ bool CSimpleSocket::Select(int32_t nTimeoutSec, int32_t nTimeoutUSec) {
   // If a file descriptor (read/write) is set then check the
   // socket error (SO_ERROR) to see if there is a pending error.
   //----------------------------------------------------------------------
-  else if ((FD_ISSET(m_socket, &m_readFds)) || (FD_ISSET(m_socket, &m_writeFds))) {
+  else if ((FD_ISSET(m_socket, &m_readFds)) ||
+           (FD_ISSET(m_socket, &m_writeFds))) {
     int32_t nLen = sizeof(nError);
 
     if (GETSOCKOPT(m_socket, SOL_SOCKET, SO_ERROR, &nError, &nLen) == 0) {
@@ -1309,11 +1335,12 @@ bool CSimpleSocket::Select(int32_t nTimeoutSec, int32_t nTimeoutUSec) {
 //
 //------------------------------------------------------------------------------
 
-int CSimpleSocket::WaitForData(size_t data_count, uint32_t timeout, size_t* returned_size) {
+int CSimpleSocket::WaitForData(size_t data_count, uint32_t timeout,
+                               size_t *returned_size) {
   size_t length = 0;
 
   if (returned_size == NULL) {
-    returned_size = (size_t*)&length;
+    returned_size = (size_t *)&length;
   }
 
   *returned_size = 0;
