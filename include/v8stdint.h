@@ -59,7 +59,7 @@ typedef unsigned __int64 uint64_t;
 
 #if defined(_WIN32)
 struct iovec {
-  void*  iov_base;
+  void  *iov_base;
   size_t iov_len;
 };
 
@@ -119,7 +119,7 @@ typedef uint32_t       _size_t;
 #define THREAD_PROC
 #endif
 
-typedef _size_t (THREAD_PROC* thread_proc_t)(void*);
+typedef _size_t (THREAD_PROC *thread_proc_t)(void *);
 
 typedef int32_t result_t;
 
@@ -238,7 +238,7 @@ enum {
 #define DEFAULT_CONNECTION_TIMEOUT_SEC 2
 #define DEFAULT_CONNECTION_TIMEOUT_USEC 0
 
-#define DEFAULT_REV_TIMEOUT_SEC 10
+#define DEFAULT_REV_TIMEOUT_SEC 2
 #define DEFAULT_REV_TIMEOUT_USEC 0
 
 
@@ -292,7 +292,7 @@ static signal_handler_t old_signal_handler = 0;
 
 #ifdef HAS_SIGACTION
 inline struct sigaction
-set_sigaction(int signal_value, const struct sigaction& action)
+set_sigaction(int signal_value, const struct sigaction &action)
 #else
 inline signal_handler_t
 set_signal_handler(int signal_value, signal_handler_t signal_handler)
@@ -315,7 +315,7 @@ set_signal_handler(int signal_value, signal_handler_t signal_handler)
     char error_string[error_length];
 #ifndef _WIN32
 #if (defined(_GNU_SOURCE) && !defined(ANDROID) &&(_POSIX_C_SOURCE >= 200112L))
-    char* msg = strerror_r(errno, error_string, error_length);
+    char *msg = strerror_r(errno, error_string, error_length);
 
     if (msg != error_string) {
       strncpy(error_string, msg, error_length);
@@ -355,7 +355,7 @@ inline void trigger_interrupt_guard_condition(int signal_value) {
 
 inline void
 #ifdef HAS_SIGACTION
-signal_handler(int signal_value, siginfo_t* siginfo, void* context)
+signal_handler(int signal_value, siginfo_t *siginfo, void *context)
 #else
 signal_handler(int signal_value)
 #endif
@@ -371,9 +371,9 @@ signal_handler(int signal_value)
     }
   } else {
     if (
-        old_action.sa_handler != NULL &&  // Is set
-        old_action.sa_handler != SIG_DFL &&  // Is not default
-        old_action.sa_handler != SIG_IGN) { // Is not ignored
+      old_action.sa_handler != NULL &&  // Is set
+      old_action.sa_handler != SIG_DFL &&  // Is not default
+      old_action.sa_handler != SIG_IGN) { // Is not ignored
       old_action.sa_handler(signal_value);
     }
   }
@@ -391,7 +391,7 @@ signal_handler(int signal_value)
 
 namespace ydlidar {
 
-inline void init(int argc, char* argv[]) {
+inline void init(int argc, char *argv[]) {
   UNUSED(argc);
   UNUSED(argv);
 #ifdef HAS_SIGACTION
