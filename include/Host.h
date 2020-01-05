@@ -69,7 +69,7 @@ typedef int            SOCKET;
 
 #if defined(_WIN32)
 struct iovec {
-  void*  iov_base;
+  void  *iov_base;
   size_t iov_len;
 };
 
@@ -210,7 +210,7 @@ typedef int socklen_t;
 #define DEFAULT_CONNECTION_TIMEOUT_USEC 0
 
 #define DEFAULT_REV_TIMEOUT_SEC 2
-#define DEFAULT_REV_TIMEOUT_USEC 200000000
+#define DEFAULT_REV_TIMEOUT_USEC 0
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
